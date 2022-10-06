@@ -15,12 +15,12 @@ func (h handler) AddTask(ctx *gin.Context) {
 		return
 	}
 
-	var task Task
-
-	task.Name = body.Name
-	task.Description = body.Description
-	task.DueDate = body.DueDate
-	task.Status = body.Status
+	task := Task{
+		Name:        body.Name,
+		Description: body.Description,
+		DueDate:     body.DueDate,
+		Status:      body.Status,
+	}
 
 	if result := h.DB.Create(&task); result.Error != nil {
 		ctx.AbortWithError(http.StatusNotFound, result.Error)
