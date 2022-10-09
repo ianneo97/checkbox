@@ -33,12 +33,12 @@ func TestAddTask(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	// This is to signify that it is a due soon task
-	currentTime := time.Now().AddDate(0, 0, 1)
+	ct := time.Now().AddDate(0, 0, 1)
 
 	task := tasks.Task{
 		Name:        "Test Task",
 		Description: "This is a test task",
-		DueDate:     &currentTime,
+		DueDate:     &ct,
 	}
 
 	jsonValue, _ := json.Marshal(task)
@@ -61,6 +61,7 @@ func TestUpdateTask(t *testing.T) {
 	r := setupInitialBase()
 	w := httptest.NewRecorder()
 
+	// This is to signify the task is not urgent
 	ct := time.Now().AddDate(0, 0, 8)
 	task := tasks.Task{
 		Name:        "Test Task",
@@ -93,7 +94,7 @@ func TestDeleteTask(t *testing.T) {
 }
 
 func setupInitialBase() *gin.Engine {
-	viper.SetConfigFile("../../pkg/config/envs/.env")
+	viper.SetConfigFile("../pkg/config/envs/.env")
 	viper.ReadInConfig()
 
 	db := db.Init()
