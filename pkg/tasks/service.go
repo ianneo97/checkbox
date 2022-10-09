@@ -2,6 +2,7 @@ package tasks
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ianneo97/checkbox/pkg/tasks/requests"
@@ -15,11 +16,22 @@ func (h handler) AddTask(ctx *gin.Context) {
 		return
 	}
 
+	current := time.Now()
+	status := "pending"
+
+	if body.DueDate.After(current) {
+		status = TaskStatus.String(NOT_URGENT)
+	}
+
+	if body.DueDate.Before(current) {
+		status = TaskStatus.String(OVERDUE)
+	}
+
 	task := Task{
 		Name:        body.Name,
 		Description: body.Description,
 		DueDate:     body.DueDate,
-		Status:      body.Status,
+		Status:      status,
 	}
 
 	if result := h.DB.Create(&task); result.Error != nil {
@@ -51,21 +63,21 @@ func (h handler) UpdateTask(ctx *gin.Context) {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
-	var book Task
+	var task Task
 
-	if result := h.DB.First(&book, id); result.Error != nil {
+	if result := h.DB.First(&task, id); result.Error != nil {
 		ctx.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
 
-	book.Name = body.Name
-	book.Description = body.Description
-	book.DueDate = body.DueDate
-	book.Status = body.Status
+	task.Name = body.Name
+	task.Description = body.Description
+	task.DueDate = body.DueDate
+	task.Status = body.Status
 
-	h.DB.Save(&book)
+	h.DB.Save(&task)
 
-	ctx.JSON(http.StatusOK, &book)
+	ctx.JSON(http.StatusOK, &task)
 }
 
 func (h handler) DeleteTask(ctx *gin.Context) {
@@ -86,7 +98,7 @@ func (h handler) DeleteTask(ctx *gin.Context) {
 func (h handler) ListTasks(ctx *gin.Context) {
 	var tasks []Task
 
-	if result := h.DB.Find(&tasks); result.Error != nil {
+	if result := h.DB.Order("created_at").Find(&tasks); result.Error != nil {
 		ctx.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}

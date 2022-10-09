@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/ianneo97/checkbox/pkg/config/db"
 	"github.com/ianneo97/checkbox/pkg/tasks"
@@ -16,8 +17,13 @@ func main() {
 
 	gin.SetMode(gin.DebugMode)
 
+	config := cors.DefaultConfig()
+	// config.AllowOrigins = []string{"http://localhost:3001"}
+	config.AllowAllOrigins = true
+
 	router := gin.New()
 	router.Use(gin.Logger())
+	router.Use(cors.Default())
 
 	dbHandler := db.Init(dbUrl)
 
