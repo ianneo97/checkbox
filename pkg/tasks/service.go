@@ -16,26 +16,11 @@ func (h handler) AddTask(ctx *gin.Context) {
 		return
 	}
 
-	current := time.Now()
-	status := "pending"
-
-	if body.DueDate.After(current) {
-		if body.DueDate.Before(current.AddDate(0, 0, 7)) {
-			status = TaskStatus.String(DUE_SOON)
-		} else {
-			status = TaskStatus.String(NOT_URGENT)
-		}
-	}
-
-	if body.DueDate.Before(current) {
-		status = TaskStatus.String(OVERDUE)
-	}
-
 	task := Task{
 		Name:        body.Name,
 		Description: body.Description,
 		DueDate:     body.DueDate,
-		Status:      status,
+		Status:      getStatus(body.DueDate),
 	}
 
 	if result := h.DB.Create(&task); result.Error != nil {
@@ -77,7 +62,7 @@ func (h handler) UpdateTask(ctx *gin.Context) {
 	task.Name = body.Name
 	task.Description = body.Description
 	task.DueDate = body.DueDate
-	task.Status = body.Status
+	task.Status = getStatus(body.DueDate)
 
 	h.DB.Save(&task)
 
@@ -108,4 +93,24 @@ func (h handler) ListTasks(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, &tasks)
+}
+
+func getStatus(d *time.Time) string {
+	status := ""
+	current := time.Now()
+	oneWeekAfter := current.AddDate(0, 0, 7)
+
+	if (d.After(current) && d.Before(oneWeekAfter)) || d.Equal(oneWeekAfter) {
+		status = TaskStatus.String(DUE_SOON)
+	}
+
+	if d.After(oneWeekAfter) {
+		status = TaskStatus.String(NOT_URGENT)
+	}
+
+	if d.Before(current) {
+		status = TaskStatus.String(OVERDUE)
+	}
+
+	return status
 }

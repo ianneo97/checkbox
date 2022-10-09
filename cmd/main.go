@@ -17,10 +17,6 @@ func main() {
 
 	gin.SetMode(gin.DebugMode)
 
-	config := cors.DefaultConfig()
-	// config.AllowOrigins = []string{"http://localhost:3001"}
-	config.AllowAllOrigins = true
-
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(cors.Default())
