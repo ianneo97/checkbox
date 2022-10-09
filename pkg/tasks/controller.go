@@ -5,12 +5,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type handler struct {
+type Handler struct {
 	DB *gorm.DB
 }
 
 func RegisterRoutes(router *gin.Engine, db *gorm.DB) {
-	h := &handler{
+	h := &Handler{
 		DB: db,
 	}
 

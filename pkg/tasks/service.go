@@ -8,7 +8,7 @@ import (
 	"github.com/ianneo97/checkbox/pkg/tasks/requests"
 )
 
-func (h handler) AddTask(ctx *gin.Context) {
+func (h Handler) AddTask(ctx *gin.Context) {
 	body := requests.AddTaskRequestBody{}
 
 	if err := ctx.BindJSON(&body); err != nil {
@@ -28,10 +28,10 @@ func (h handler) AddTask(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, &body)
+	ctx.JSON(http.StatusCreated, &task)
 }
 
-func (h handler) GetTask(ctx *gin.Context) {
+func (h Handler) GetTask(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	var task Task
@@ -44,7 +44,7 @@ func (h handler) GetTask(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &task)
 }
 
-func (h handler) UpdateTask(ctx *gin.Context) {
+func (h Handler) UpdateTask(ctx *gin.Context) {
 	id := ctx.Param("id")
 	body := requests.UpdateTasksRequestBody{}
 
@@ -69,7 +69,7 @@ func (h handler) UpdateTask(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &task)
 }
 
-func (h handler) DeleteTask(ctx *gin.Context) {
+func (h Handler) DeleteTask(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	var task Task
@@ -84,7 +84,7 @@ func (h handler) DeleteTask(ctx *gin.Context) {
 	ctx.Status(http.StatusOK)
 }
 
-func (h handler) ListTasks(ctx *gin.Context) {
+func (h Handler) ListTasks(ctx *gin.Context) {
 	name := ctx.Query("name")
 
 	var tasks []Task

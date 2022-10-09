@@ -6,24 +6,27 @@ import (
 	"github.com/ianneo97/checkbox/pkg/config/db"
 	"github.com/ianneo97/checkbox/pkg/tasks"
 	"github.com/spf13/viper"
+	"gorm.io/gorm"
 )
 
 func main() {
 	viper.SetConfigFile("./pkg/config/envs/.env")
 	viper.ReadInConfig()
 
-	port := viper.Get("PORT").(string)
-	dbUrl := viper.Get("DB_URL").(string)
-
 	gin.SetMode(gin.DebugMode)
 
+	db := db.Init()
+	r := setupRouter(db)
+
+	r.Run(":8000")
+}
+
+func setupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger())
 	router.Use(cors.Default())
 
-	dbHandler := db.Init(dbUrl)
+	tasks.RegisterRoutes(router, db)
 
-	tasks.RegisterRoutes(router, dbHandler)
-
-	router.Run(port)
+	return router
 }
