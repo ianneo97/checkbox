@@ -20,7 +20,11 @@ func (h handler) AddTask(ctx *gin.Context) {
 	status := "pending"
 
 	if body.DueDate.After(current) {
-		status = TaskStatus.String(NOT_URGENT)
+		if body.DueDate.Before(current.AddDate(0, 0, 7)) {
+			status = TaskStatus.String(DUE_SOON)
+		} else {
+			status = TaskStatus.String(NOT_URGENT)
+		}
 	}
 
 	if body.DueDate.Before(current) {
