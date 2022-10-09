@@ -85,9 +85,17 @@ func (h handler) DeleteTask(ctx *gin.Context) {
 }
 
 func (h handler) ListTasks(ctx *gin.Context) {
+	name := ctx.Query("name")
+
 	var tasks []Task
 
-	if result := h.DB.Order("created_at").Find(&tasks); result.Error != nil {
+	query := h.DB.Order("created_at")
+
+	if name != "" {
+		query.Where("name LIKE ?", "%"+name+"%")
+	}
+
+	if result := query.Find(&tasks); result.Error != nil {
 		ctx.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
